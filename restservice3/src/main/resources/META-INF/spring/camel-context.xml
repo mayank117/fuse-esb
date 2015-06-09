@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+	xsi:schemaLocation="
+         http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://camel.apache.org/schema/cxf 
+         http://camel.apache.org/schema/cxf/camel-cxf.xsd
+         http://www.springframework.org/schema/osgi-compendium
+         http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+         http://www.springframework.org/schema/util 
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+        
+        <cxf:rsServer id="heartbeatService1" address="http://localhost:8282/sample/heartbeat" serviceClass="com.mycompany.restservice3.HeartbeatService" />
+        <cxf:rsServer id="heartbeatService2" address="/sample/heartbeat/new" serviceClass="com.mycompany.restservice3.HeartbeatService" />
+	
+	<bean id="sampleRestService"
+		class="com.mycompany.restservice3.SampleRestService" />
+			
+	<jaxrs:server id="restService" address="/sample/cxf/rest">
+		<jaxrs:serviceBeans>
+			<ref bean="sampleRestService" />
+		</jaxrs:serviceBeans>
+	</jaxrs:server>
+	
+	<cxf:cxfEndpoint id="sampleSoapService" address="/sample/cxf/soap"
+		serviceClass="com.sample.cxf.SampleSoapServicePortType">
+	</cxf:cxfEndpoint>
+
+ <!--  <camelContext xmlns="http://camel.apache.org/schema/spring">
+    <route>
+      <from uri="timer:foo?period=5000"/>
+      <setBody>
+          <method ref="helloBean" method="hello"/>
+      </setBody>
+      <log message="The message contains ${body}"/>
+    </route>
+  </camelContext> -->
+
+</beans>
