@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+	xsi:schemaLocation="
+	http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+         http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://camel.apache.org/schema/cxf 
+         http://camel.apache.org/schema/cxf/camel-cxf.xsd
+         http://www.springframework.org/schema/osgi-compendium
+         http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+         http://www.springframework.org/schema/util 
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+        
+  <bean id="helloBean" class="com.mycompany.camel.cxf.dataformat.log.HelloBean">
+      <property name="say" value="Hi from Camel"/>
+  </bean>
+  
+  <bean id="dataTransformer" class="com.mycompany.camel.cxf.dataformat.Transformer" />
+
+  <camelContext xmlns="http://camel.apache.org/schema/spring">
+    <dataFormats>
+        <json library="Jackson" unmarshalTypeName="com.mycompany.camel.cxf.dataformat.User" id="jack"/>
+    </dataFormats>
+    <route id="cxfRsEndpointToLog">
+        <from uri="cxfrs:bean:endpointService"/>
+        <process ref="dataTransformer"/>
+        <marshal ref="jack"/>
+        <log message="${body} -- message received"/>
+    </route>
+</camelContext>
+
+<cxf:rsServer id="endpointService" address="http://0.0.0.0:7997/transformer/endpoint"
+		serviceClass="com.mycompany.camel.cxf.dataformat.EndPointService" />
+
+</beans>
