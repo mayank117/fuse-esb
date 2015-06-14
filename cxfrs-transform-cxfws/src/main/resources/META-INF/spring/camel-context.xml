@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xmlns:jaxrs="http://cxf.apache.org/jaxrs" xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+	xsi:schemaLocation="
+	http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd
+         http://www.springframework.org/schema/beans 
+         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+         http://camel.apache.org/schema/cxf 
+         http://camel.apache.org/schema/cxf/camel-cxf.xsd
+         http://www.springframework.org/schema/osgi-compendium
+         http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+         http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd
+         http://www.springframework.org/schema/util 
+        http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+
+	<cxf:rsServer id="heartbeatService1" address="http://localhost:8282/sample/heartbeat"
+		serviceClass="com.mycompany.cxf.transform.cxf.EndPointService" />
+
+	<!--  soap service from service mix master examples -->
+	<cxf:cxfEndpoint id="sampleSoapService" address="http://localhost:8989/soap"
+		serviceClass="org.apache.servicemix.examples.camel.soap.PersonService">
+	</cxf:cxfEndpoint>
+
+	<bean id="transformer" class="com.mycompany.cxf.transform.cxf.Transformer" />
+
+	<camelContext id="camel" xmlns="http://camel.apache.org/schema/spring">
+		<route>
+			<from uri="cxfrs://bean://heartbeatService1" />
+			<bean ref="transformer" method="transform" />
+			<setHeader headerName="operationName">
+				<constant>putPerson</constant>
+			</setHeader>
+			<setHeader headerName="operationNamespace">
+				<constant>http://soap.camel.examples.servicemix.apache.org/
+				</constant>
+			</setHeader>
+			<!-- <setBody><simple>1</simple></setBody> -->
+			<to uri="cxf:bean:sampleSoapService" />
+			<bean ref="transformer" method="transformResponse" />
+		</route>
+	</camelContext>
+
+</beans>
